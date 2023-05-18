@@ -1,0 +1,463 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "htt`://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>520快乐!</title>
+    <style type="text/css">
+      #imgwrap {
+        width: 900px;
+        height: 700px;
+        margin: 50px auto;
+        perspective: 880px;
+      }
+      #imgwrap img {
+        width: 90px;
+        height: 160px;
+        float: left;
+      }
+      #btn {
+        width: 100px;
+        text-align: center;
+        font: 16px/40px "微软雅黑";
+        color: white;
+        padding: 0 20px;
+        margin: 0 auto;
+        border-radius: 5px;
+        background: rgb(0, 100, 0);
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+        cursor: pointer;
+      }
+      /*box-shadow(阴影): 2px(x) 2px(y) 5px(大小) rgba(0,0,0,0.5);*/
+    </style>
+    <link type="text/css" rel="stylesheet" href="./css/default.css" />
+    <script type="text/javascript" src="./css/jquery.min.js"></script>
+    <script type="text/javascript" src="./css/jscex.min.js"></script>
+    <script type="text/javascript" src="./css/jscex-parser.js"></script>
+    <script type="text/javascript" src="./css/jscex-jit.js"></script>
+    <script
+      type="text/javascript"
+      src="./css/jscex-builderbase.min.js"
+    ></script>
+    <script type="text/javascript" src="./css/jscex-async.min.js"></script>
+    <script
+      type="text/javascript"
+      src="./css/jscex-async-powerpack.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="./css/functions.js"
+      charset="utf-8"
+    ></script>
+    <script type="text/javascript" src="./css/love.js" charset="utf-8"></script>
+    <style type="text/css">
+      <!--
+      .STYLE1 {color: #666666}
+      -->
+    </style>
+    <script type="text/javascript">
+      /*
+       * 运动的步骤
+       * 1：闪的效果（瞬间宽高都变为0，css3属性scal：缩小，随机）
+       * 2：图片从小变到大，同时透明度从1变到0（必须是上一步效果走完了他才会走）
+       * 3：图片旋转，同时透明度从0变到1 有层次感（位移translate）（当所有图片的透明度变为0的时候，才会走这一步）
+       */
+      window.onload = function () {
+        var btn = document.getElementById("btn");
+        var imgs = document.querySelectorAll("img");
+        var on = true; //这个变量决定用户是否可以再次点击(true代表可以点，false代表不可以点)
+        //				给btn添加点击事件
+        btn.onclick = function () {
+          if (!on) {
+            return;
+          }
+          on = false;
+          var endNum = 0; //运动完成的图片数量
+          var allEnd = 0; //用来判断所有的图片是否都运动完了
+          for (var i = 0; i < imgs.length; i++) {
+            (function (i) {
+              setTimeout(function () {
+                montion(
+                  imgs[i],
+                  "10ms",
+                  function () {
+                    this.style.transform = "scale(0)"; //缩放到0
+                  },
+                  function () {
+                    //第二个运动要在这里写
+                    montion(
+                      this,
+                      "1s",
+                      function () {
+                        this.style.transform = "scale(1)";
+                        this.style.opacity = 0;
+                      },
+                      function () {
+                        endNum++; //只要有一张图走完了，就让他加个1
+                        if (endNum == imgs.length) {
+                          toBig();
+                        }
+                      }
+                    );
+                  }
+                );
+              }, Math.random() * 1000); //500毫秒
+            })(i);
+          }
+          function toBig() {
+            //						这个函数用来做第三个效果
+            /*
+             * 坐标轴
+             * x轴（平行地面）
+             * y轴（垂直地面）
+             * x轴（垂直屏幕）
+             */
+            for (var i = 0; i < imgs.length; i++) {
+              imgs[i].style.transition = "";
+              //想要一个物体有css3中的一些变化，那就需要给他一个初始值
+              imgs[i].style.transform =
+                "rotateY(0deg)translateZ(-" + Math.random() * 500 + "px)";
+              //用这种方式去写是因为想要在循环里找i的值
+              (function (i) {
+                setTimeout(function () {
+                  montion(
+                    imgs[i],
+                    "2s",
+                    function () {
+                      this.style.opacity = 1;
+                      this.style.transform = "rotateY(-360deg) translateZ(0)";
+                    },
+                    function () {
+                      allEnd++;
+                      if (allEnd == imgs.length) {
+                        //这个条件成立，说明所有图片都运动完了，可以让用户再次点击了
+                        on = true; //当所有运动完了以后才可以点
+                      }
+                    }
+                  );
+                }, Math.random() * 1000);
+              })(i);
+            }
+          }
+        };
+        //						运动函数(运动的对象/运动的时间/运动的属性函数/运动完成后要做的事情)
+        function montion(obj, time, doFn, callBack) {
+          obj.style.transition = time;
+          doFn.call(obj); //调用函数,并把this的指向给obj
+          var called = false; //解决transitionend调用多次的bug
+          obj.addEventListener(
+            "transitionend",
+            function () {
+              if (!called) {
+                callBack && callBack.call(obj);
+                called = true;
+              }
+            },
+            false
+          );
+        }
+        btn.click();
+      };
+    </script>
+  </head>
+  <body style="height: 100%; width: 100%">
+    <audio autoplay="autopaly" controls>
+      <source src="music/love.mp3" type="audio/mp3" />
+    </audio>
+    <div id="main">
+      <div id="wrap">
+        <div id="text">
+          <div id="code">
+            <font color="#FF0000">
+              <span class="say"><h1>给廖艺的一些话：</h1></span><br /><br />
+              <span class="say"
+                >亲爱的，当我和你在一起时，我的心情总是充满了欢乐和喜悦。我喜欢与你分享生活中的点滴，每一个微笑和眼神交流都让我感到无比的舒适和温暖。
+                你的存在让我的世界变得更加美好和有意义，你的聪明和智慧总是启发我，让我变得更加成熟和有思想。每一个和你在一起的瞬间，都是我最珍贵的回忆。
+                让我们继续相互支持和珍惜对方，共同走过这段美好的人生旅程吧。我会一直爱你，直到永远。</span
+              >
+              <span class="say"><span class="space"></span> -- 吴师晴 --</span
+              ><br />
+              <span class="say"><h1>520快乐</h1></span><br />
+            </font>
+          </div>
+        </div>
+        <div id="clock-box">
+          <!-- <span class="STYLE1"></span><font color="#33CC00">距离我喜欢你，</font>
+<span class="STYLE1">已经是……</span> -->
+          <span class="STYLE1"></span>
+          <font color="#33CC00"></font>
+          <span class="STYLE1"></span>
+          <!-- <div id="clock"></div> -->
+        </div>
+        <canvas id="canvas" width="1100" height="680"></canvas>
+      </div>
+    </div>
+
+    <div id="imgwrap" style="margin-top: 200px">
+      <img src="img/1.jpg" alt="" />
+      <img src="img/2.jpg" alt="" />
+      <img src="img/3.jpg" alt="" />
+      <img src="img/4.jpg" alt="" />
+      <img src="img/5.jpg" alt="" />
+      <img src="img/6.jpg" alt="" />
+      <img src="img/7.jpg" alt="" />
+      <img src="img/8.jpg" alt="" />
+      <img src="img/9.jpg" alt="" />
+      <img src="img/10.jpg" alt="" />
+      <img src="img/11.jpg" alt="" />
+      <img src="img/12.jpg" alt="" />
+      <img src="img/13.jpg" alt="" />
+      <img src="img/14.jpg" alt="" />
+      <img src="img/15.jpg" alt="" />
+      <img src="img/16.jpg" alt="" />
+      <img src="img/17.jpg" alt="" />
+      <img src="img/18.jpg" alt="" />
+      <img src="img/19.jpg" alt="" />
+      <img src="img/20.jpg" alt="" />
+      <img src="img/21.jpg" alt="" />
+      <img src="img/22.jpg" alt="" />
+      <img src="img/23.jpg" alt="" />
+      <img src="img/24.jpg" alt="" />
+      <img src="img/25.jpg" alt="" />
+      <img src="img/26.jpg" alt="" />
+      <img src="img/27.jpg" alt="" />
+      <img src="img/28.jpg" alt="" />
+      <img src="img/29.jpg" alt="" />
+      <img src="img/30.jpg" alt="" />
+      <img src="img/31.jpg" alt="" />
+      <img src="img/32.jpg" alt="" />
+      <img src="img/33.jpg" alt="" />
+      <img src="img/34.jpg" alt="" />
+      <img src="img/35.jpg" alt="" />
+      <img src="img/36.jpg" alt="" />
+      <img src="img/37.jpg" alt="" />
+      <img src="img/38.jpg" alt="" />
+      <img src="img/39.jpg" alt="" />
+      <img src="img/40.jpg" alt="" />
+    </div>
+    <div id="btn">点我看好东西</div>
+
+    <script>
+      (function () {
+        var canvas = $("#canvas");
+
+        if (!canvas[0].getContext) {
+          $("#error").show();
+          return false;
+        }
+
+        var width = canvas.width();
+        var height = canvas.height();
+        canvas.attr("width", width);
+        canvas.attr("height", height);
+        var opts = {
+          seed: {
+            x: width / 2 - 20,
+            color: "rgb(190, 26, 37)",
+            scale: 2,
+          },
+          branch: [
+            [
+              535,
+              680,
+              570,
+              250,
+              500,
+              200,
+              30,
+              100,
+              [
+                [
+                  540,
+                  500,
+                  455,
+                  417,
+                  340,
+                  400,
+                  13,
+                  100,
+                  [[450, 435, 434, 430, 394, 395, 2, 40]],
+                ],
+                [
+                  550,
+                  445,
+                  600,
+                  356,
+                  680,
+                  345,
+                  12,
+                  100,
+                  [[578, 400, 648, 409, 661, 426, 3, 80]],
+                ],
+                [539, 281, 537, 248, 534, 217, 3, 40],
+                [
+                  546,
+                  397,
+                  413,
+                  247,
+                  328,
+                  244,
+                  9,
+                  80,
+                  [
+                    [427, 286, 383, 253, 371, 205, 2, 40],
+                    [498, 345, 435, 315, 395, 330, 4, 60],
+                  ],
+                ],
+                [
+                  546,
+                  357,
+                  608,
+                  252,
+                  678,
+                  221,
+                  6,
+                  100,
+                  [[590, 293, 646, 277, 648, 271, 2, 80]],
+                ],
+              ],
+            ],
+          ],
+          bloom: {
+            num: 700,
+            width: 1080,
+            height: 650,
+          },
+          footer: {
+            width: 1200,
+            height: 5,
+            speed: 10,
+          },
+        };
+
+        var tree = new Tree(canvas[0], width, height, opts);
+        var seed = tree.seed;
+        var foot = tree.footer;
+        var hold = 1;
+
+        canvas
+          .click(function (e) {
+            var offset = canvas.offset(),
+              x,
+              y;
+            x = e.pageX - offset.left;
+            y = e.pageY - offset.top;
+            if (seed.hover(x, y)) {
+              hold = 0;
+              canvas.unbind("click");
+              canvas.unbind("mousemove");
+              canvas.removeClass("hand");
+            }
+          })
+          .mousemove(function (e) {
+            var offset = canvas.offset(),
+              x,
+              y;
+            x = e.pageX - offset.left;
+            y = e.pageY - offset.top;
+            canvas.toggleClass("hand", seed.hover(x, y));
+          });
+
+        var seedAnimate = eval(
+          Jscex.compile("async", function () {
+            seed.draw();
+            while (hold) {
+              $await(Jscex.Async.sleep(10));
+            }
+            while (seed.canScale()) {
+              seed.scale(0.95);
+              $await(Jscex.Async.sleep(10));
+            }
+            while (seed.canMove()) {
+              seed.move(0, 2);
+              foot.draw();
+              $await(Jscex.Async.sleep(10));
+            }
+          })
+        );
+
+        var growAnimate = eval(
+          Jscex.compile("async", function () {
+            do {
+              tree.grow();
+              $await(Jscex.Async.sleep(10));
+            } while (tree.canGrow());
+          })
+        );
+
+        var flowAnimate = eval(
+          Jscex.compile("async", function () {
+            do {
+              tree.flower(2);
+              $await(Jscex.Async.sleep(10));
+            } while (tree.canFlower());
+          })
+        );
+
+        var moveAnimate = eval(
+          Jscex.compile("async", function () {
+            tree.snapshot("p1", 240, 0, 610, 680);
+            while (tree.move("p1", 500, 0)) {
+              foot.draw();
+              $await(Jscex.Async.sleep(10));
+            }
+            foot.draw();
+            tree.snapshot("p2", 500, 0, 610, 680);
+
+            // 会有闪烁不得意这样做, (＞﹏＜)
+            canvas
+              .parent()
+              .css("background", "url(" + tree.toDataURL("image/png") + ")");
+            canvas.css("background", "#ffe");
+            $await(Jscex.Async.sleep(300));
+            canvas.css("background", "none");
+          })
+        );
+
+        var jumpAnimate = eval(
+          Jscex.compile("async", function () {
+            var ctx = tree.ctx;
+            while (true) {
+              tree.ctx.clearRect(0, 0, width, height);
+              tree.jump();
+              foot.draw();
+              $await(Jscex.Async.sleep(25));
+            }
+          })
+        );
+
+        var textAnimate = eval(
+          Jscex.compile("async", function () {
+            var together = new Date();
+            together.setFullYear(2009, 10, 23); //时间年月日
+            together.setHours(16); //小时
+            together.setMinutes(53); //分钟
+            together.setSeconds(0); //秒前一位
+            together.setMilliseconds(2); //秒第二位
+
+            $("#code").show().typewriter();
+            $("#clock-box").fadeIn(500);
+            while (true) {
+              timeElapse(together);
+              $await(Jscex.Async.sleep(1000));
+            }
+          })
+        );
+
+        var runAsync = eval(
+          Jscex.compile("async", function () {
+            $await(seedAnimate());
+            $await(growAnimate());
+            $await(flowAnimate());
+            $await(moveAnimate());
+
+            textAnimate().start();
+
+            $await(jumpAnimate());
+          })
+        );
+
+        runAsync().start();
+      })();
+    </script>
+  </body>
+</html>
